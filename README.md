@@ -1,0 +1,1 @@
+yes this is vibe-coded, but idc because it is a very small project and with rust's robust compiler it won't be nearly as buggy as other ai code.

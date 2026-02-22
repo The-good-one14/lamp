@@ -105,6 +105,7 @@ struct App {
     is_playing: bool,
     loop_mode: bool,
     shuffle_mode: bool,
+    volume: f32,
     
     focus: Focus,
     input_mode: InputMode,
@@ -196,6 +197,7 @@ impl App {
             is_playing: false,
             loop_mode: false,
             shuffle_mode: false,
+            volume: 1.0,
             focus: Focus::Library,
             input_mode: InputMode::Normal,
             input: String::new(),
@@ -467,6 +469,16 @@ impl App {
         }
         
         self.sync_shared_state();
+    }
+
+    fn increase_volume(&mut self) {
+        self.volume = (self.volume + 0.1).min(2.0);
+        self.sink.set_volume(self.volume);
+    }
+
+    fn decrease_volume(&mut self) {
+        self.volume = (self.volume - 0.1).max(0.0);
+        self.sink.set_volume(self.volume);
     }
 
     fn update(&mut self) {
@@ -834,6 +846,8 @@ where
                     KeyCode::Char('p') => app.previous(),
                     KeyCode::Char('l') => app.toggle_loop(),
                     KeyCode::Char('s') => app.toggle_shuffle(),
+                    KeyCode::Char('=') | KeyCode::Char('+') => app.increase_volume(),
+                    KeyCode::Char('-') => app.decrease_volume(),
                     KeyCode::Char('/') => {
                         app.input_mode = InputMode::Searching;
                         app.input.clear();
@@ -1006,6 +1020,8 @@ fn ui(f: &mut ratatui::Frame, app: &mut App) {
         Span::styled(if app.loop_mode { "ON" } else { "OFF" }, Style::default().fg(if app.loop_mode { Color::Yellow } else { Color::DarkGray })),
         Span::raw(" | Shuffle: "),
         Span::styled(if app.shuffle_mode { "ON" } else { "OFF" }, Style::default().fg(if app.shuffle_mode { Color::Yellow } else { Color::DarkGray })),
+        Span::raw(" | Volume: "),
+        Span::styled(format!("{:.0}%", app.volume * 100.0), Style::default().fg(Color::Yellow)),
         Span::raw(" | Status: "),
         Span::styled(format!("{} {}", status_symbol, if app.is_playing { "Playing" } else { "Paused" }), Style::default().fg(status_color)),
     ]);
@@ -1025,6 +1041,7 @@ fn ui(f: &mut ratatui::Frame, app: &mut App) {
         Span::styled("[]]", Style::default().fg(Color::Magenta)), Span::raw(" Move Down | "),
         Span::styled("[Space]", Style::default().fg(Color::Magenta)), Span::raw(" Play/Pause | "),
         Span::styled("[n/p]", Style::default().fg(Color::Magenta)), Span::raw(" Next/Prev | "),
+        Span::styled("[+/-]", Style::default().fg(Color::Magenta)), Span::raw(" Volume | "),
         Span::styled("[q]", Style::default().fg(Color::Magenta)), Span::raw(" Quit")
     ]);
     

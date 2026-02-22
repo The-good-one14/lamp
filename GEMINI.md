@@ -50,6 +50,7 @@ The project uses standard Cargo commands:
   - `p`: Previous track.
   - `l`: Toggle Loop.
   - `s`: Toggle Shuffle.
+  - `+` / `-`: Adjust volume.
   - `q`: Quit.
 
 ## Key Files
